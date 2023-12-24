@@ -6,6 +6,7 @@ import { container } from "./config/inversify.config";
 import { InversifyExpressServer } from "inversify-express-utils";
 import "./contract/contract.controller";
 import "./job/job.controller";
+import "./admin/admin.controller";
 
 let app: Express.Application = Express();
 app.use(bodyParser.json());
