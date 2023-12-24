@@ -9,6 +9,7 @@ import { errorMiddleware } from "./middleware/global-handle-error";
 import "./contract/contract.controller";
 import "./job/job.controller";
 import "./admin/admin.controller";
+import "./balance/balance.controller";
 
 let app: Express.Application = Express();
 app.use(bodyParser.json());

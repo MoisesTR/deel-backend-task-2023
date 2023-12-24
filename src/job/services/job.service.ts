@@ -1,16 +1,16 @@
 import { inject, injectable } from "inversify";
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import { Contract, Job, Profile, sequelize } from "src/model";
 import { ContractStatusEnum } from "src/types/enums/contract";
 import { TYPES } from "src/types/inversify.types";
-import { ProfileJobService } from "./profile-job.service";
+import { ProfileService } from "src/profile/profile.service";
 import { AppError } from "src/utils/app.error";
 
 @injectable()
 export class JobService {
   constructor(
-    @inject(TYPES.ProfileJobService)
-    private readonly profileJobService: ProfileJobService
+    @inject(TYPES.ProfileService)
+    private readonly profileService: ProfileService
   ) {}
 
   async findAllUnpaidJobsByProfile(profileId: number) {
@@ -50,12 +50,12 @@ export class JobService {
 
       this.validateJobPayment(job, profile);
 
-      await this.profileJobService.decrementProfileBalance(
+      await this.profileService.decrementProfileBalance(
         job.Contract.ClientId,
         job.price,
         transaction
       );
-      await this.profileJobService.incrementProfileBalance(
+      await this.profileService.incrementProfileBalance(
         job.Contract.ContractorId,
         job.price,
         transaction
@@ -69,11 +69,36 @@ export class JobService {
     });
   }
 
+  async findTotalUnpaidJobsByClient(
+    clientId: number,
+    transaction?: Transaction
+  ) {
+    const contracts = await Contract.findAll({
+      attributes: ["id"],
+      where: {
+        ClientId: clientId,
+        status: ContractStatusEnum.IN_PROGRESS,
+      },
+      transaction,
+    });
+
+    const contractIds = contracts.map((contract) => contract.id);
+
+    return Job.sum("price", {
+      where: {
+        paid: false,
+        ContractId: { [Op.in]: contractIds },
+      },
+      transaction,
+    });
+  }
+
   private validateJobPayment(job: Job, profile: Profile) {
     if (job.Contract.ClientId !== profile.id) {
       throw new AppError(
-        "Action permitted only for jobs linked to your client account."
-      , 400);
+        "Action permitted only for jobs linked to your client account.",
+        400
+      );
     }
 
     if (job.paid) {
@@ -82,14 +107,16 @@ export class JobService {
 
     if (profile.balance === undefined || profile.balance === null) {
       throw new AppError(
-        "Client balance not set. Please ensure the client account has a defined balance."
-      , 404);
+        "Client balance not set. Please ensure the client account has a defined balance.",
+        404
+      );
     }
 
     if (profile.balance < job.price) {
       throw new AppError(
-        "Insufficient funds. The client's balance is too low to cover the job cost."
-      , 400);
+        "Insufficient funds. The client's balance is too low to cover the job cost.",
+        400
+      );
     }
 
     return { valid: true };
