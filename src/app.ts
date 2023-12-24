@@ -1,9 +1,10 @@
-import 'reflect-metadata'
+import "reflect-metadata";
 import Express from "express";
 import bodyParser from "body-parser";
 
 import { container } from "./config/inversify.config";
 import { InversifyExpressServer } from "inversify-express-utils";
+import "./contract/contract.controller";
 
 let app: Express.Application = Express();
 app.use(bodyParser.json());
