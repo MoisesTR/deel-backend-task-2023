@@ -4,6 +4,8 @@ import bodyParser from "body-parser";
 
 import { container } from "./config/inversify.config";
 import { InversifyExpressServer } from "inversify-express-utils";
+import { errorMiddleware } from "./middleware/global-handle-error";
+
 import "./contract/contract.controller";
 import "./job/job.controller";
 import "./admin/admin.controller";
@@ -16,5 +18,7 @@ app.use(bodyParser.json());
  * Returns the application instance.
  * */
 app = new InversifyExpressServer(container, null, null, app).build();
+
+app.use(errorMiddleware);
 
 export default app;
