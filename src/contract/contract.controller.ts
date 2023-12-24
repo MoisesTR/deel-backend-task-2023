@@ -1,4 +1,4 @@
-import { NextFunction, Response, Request } from "express";
+import { NextFunction, Response } from "express";
 import { inject } from "inversify";
 import {
   controller,
@@ -11,6 +11,7 @@ import {
 import { getProfile } from "src/middleware/getProfile";
 import { TYPES } from "src/types/inversify.types";
 import { ContractService } from "./contract.service";
+import { ProfileRequest } from "src/types/request";
 
 @controller("/contracts")
 export class ContractController implements interfaces.Controller {
@@ -19,16 +20,25 @@ export class ContractController implements interfaces.Controller {
     private readonly contractService: ContractService
   ) {}
 
-  // * FIX ME!
   @httpGet("/:id", getProfile)
   async find(
-    @request() req: Request,
+    @request() req: ProfileRequest,
     @response() res: Response,
     @next() _next: NextFunction
   ) {
     const { id } = req.params;
+    const { profile } = req;
+
     const contract = await this.contractService.find(id);
-    if (contract === null) return res.status(404);
+    if (!contract) return res.status(404);
+
+    if (
+      contract.ContractorId !== profile.id &&
+      contract.ClientId !== profile.id
+    ) {
+      return res.status(403).end();
+    }
+
     return res.json(contract);
   }
 }

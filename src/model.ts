@@ -49,8 +49,8 @@ class Contract extends Sequelize.Model {
   declare id: number
   declare terms: string
   declare status: ContractStatusEnum
-  declare contractorId: number
-  declare clientId: number
+  declare ContractorId: number
+  declare ClientId: number
   declare client: Profile
   declare createdAt: Date
   declare updatedAt: Date
