@@ -3,6 +3,7 @@ import { inject } from "inversify";
 import {
   controller,
   httpGet,
+  httpPost,
   interfaces,
   next,
   request,
@@ -11,7 +12,7 @@ import {
 import { getProfile } from "src/middleware/getProfile";
 import { TYPES } from "src/types/inversify.types";
 import { ProfileRequest } from "src/types/request";
-import { JobService } from "./job.service";
+import { JobService } from "./services/job.service";
 
 @controller("/jobs")
 export class JobController implements interfaces.Controller {
@@ -30,5 +31,17 @@ export class JobController implements interfaces.Controller {
       req.profile.id
     );
     return res.json(unpaidJobs);
+  }
+
+  @httpPost("/:job_id/pay", getProfile)
+  async payJob(
+    @request() req: ProfileRequest,
+    @response() res: Response,
+    @next() _next: NextFunction
+  ) {
+    const { job_id } = req.params;
+
+    await this.jobService.payJob(req.profile, Number(job_id));
+    return res.status(200).end();
   }
 }
