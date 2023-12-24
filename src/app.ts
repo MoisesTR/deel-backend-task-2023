@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import { container } from "./config/inversify.config";
 import { InversifyExpressServer } from "inversify-express-utils";
 import "./contract/contract.controller";
+import "./job/job.controller";
 
 let app: Express.Application = Express();
 app.use(bodyParser.json());
