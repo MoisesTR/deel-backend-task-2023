@@ -41,4 +41,16 @@ export class ContractController implements interfaces.Controller {
 
     return res.json(contract);
   }
+
+  @httpGet("", getProfile)
+  async findAll(
+    @request() req: ProfileRequest,
+    @response() res: Response,
+    @next() _next: NextFunction
+  ) {
+    const contracts = await this.contractService.findAllByProfile(
+      req.profile.id
+    );
+    return res.json(contracts);
+  }
 }
