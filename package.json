@@ -16,8 +16,8 @@
     "tsconfig-paths": "^4.2.0"
   },
   "scripts": {
-    "start": "nodemon ./src/server.js",
-    "seed": "node ./scripts/seedDb.js"
+    "start": "ts-node-dev -r tsconfig-paths/register --rs src/server.ts",
+    "seed": "ts-node ./scripts/seedDb.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

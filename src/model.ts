@@ -1,11 +1,23 @@
-const Sequelize = require('sequelize');
+import * as Sequelize from 'sequelize'
+import { ProfileTypeEnum } from './types/enums/profile'
+import { ContractStatusEnum } from './types/enums/contract'
 
-const sequelize = new Sequelize({
+const sequelize = new Sequelize.Sequelize({
   dialect: 'sqlite',
   storage: './database.sqlite3'
-});
+})
 
-class Profile extends Sequelize.Model {}
+class Profile extends Sequelize.Model {
+  declare id: number
+  declare firstName: string
+  declare lastName: string
+  declare fullName: string
+  declare profession: string
+  declare balance: number | null
+  declare type: ProfileTypeEnum
+  declare createdAt: Date
+  declare updatedAt: Date
+}
 Profile.init(
   {
     firstName: {
@@ -33,7 +45,16 @@ Profile.init(
   }
 );
 
-class Contract extends Sequelize.Model {}
+class Contract extends Sequelize.Model {
+  declare id: number
+  declare terms: string
+  declare status: ContractStatusEnum
+  declare contractorId: number
+  declare clientId: number
+  declare client: Profile
+  declare createdAt: Date
+  declare updatedAt: Date
+}
 Contract.init(
   {
     terms: {
@@ -50,7 +71,16 @@ Contract.init(
   }
 );
 
-class Job extends Sequelize.Model {}
+class Job extends Sequelize.Model {
+  declare id: number
+  declare description: string
+  declare price: number
+  declare paid: boolean
+  declare paymentDate: Date
+  declare createdAt: Date
+  declare updatedAt: Date
+  declare contract: Contract
+}
 Job.init(
   {
     description: {
@@ -63,7 +93,7 @@ Job.init(
     },
     paid: {
       type: Sequelize.BOOLEAN,
-      default:false
+      defaultValue: false
     },
     paymentDate:{
       type: Sequelize.DATE
@@ -82,9 +112,9 @@ Contract.belongsTo(Profile, {as: 'Client'})
 Contract.hasMany(Job)
 Job.belongsTo(Contract)
 
-module.exports = {
-  sequelize,
+export {
   Profile,
   Contract,
-  Job
-};
+  Job,
+  sequelize
+}
