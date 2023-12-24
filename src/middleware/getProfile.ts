@@ -1,8 +1,9 @@
 import { NextFunction, Response } from "express";
 import { Profile } from "../model"
+import { ProfileRequest } from "src/types/request";
 
 export const getProfile = async (
-  req: any,
+  req: ProfileRequest,
   res: Response,
   next: NextFunction
 ) => {
