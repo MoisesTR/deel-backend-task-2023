@@ -79,7 +79,7 @@ class Job extends Sequelize.Model {
   declare paymentDate: Date
   declare createdAt: Date
   declare updatedAt: Date
-  declare contract: Contract
+  declare Contract: Contract
 }
 Job.init(
   {
