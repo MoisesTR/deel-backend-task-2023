@@ -11,6 +11,7 @@ import {
 import { TYPES } from "src/types/inversify.types";
 import { ProfileRequest } from "src/types/request";
 import { AdminService } from "./admin.service";
+import { AppError } from "src/utils/app.error";
 
 @controller("/admin")
 export class AdminController implements interfaces.Controller {
@@ -44,6 +45,36 @@ export class AdminController implements interfaces.Controller {
     }
 
     return res.json(bestProfession);
+  }
+
+  @httpGet("/best-clients")
+  async findBestClients(
+    @request() req: ProfileRequest,
+    @response() res: Response,
+    @next() _next: NextFunction
+  ) {
+    const { start, end, limit } = req.query;
+    const startDate = String(start);
+    const endDate = String(end);
+    const validationDateResult = this.validateDates(startDate, endDate);
+
+    if (!validationDateResult.valid) {
+      return res.status(400).send(validationDateResult.message);
+    }
+
+    const limitNumber = limit ? parseInt(String(limit)) : 2;
+
+    if (isNaN(limitNumber) || limitNumber < 1) {
+      throw new AppError("Limit must be a positive integer.", 400);
+    }
+
+    const bestClients = await this.adminService.findBestClients(
+      new Date(startDate),
+      new Date(endDate),
+      limitNumber
+    );
+
+    return res.json(bestClients);
   }
 
   private validateDates(startDate: string, endDate: string) {

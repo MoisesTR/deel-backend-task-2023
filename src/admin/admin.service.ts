@@ -33,4 +33,44 @@ export class AdminService {
       order: [[sequelize.col("totalEarnings"), "DESC"]],
     });
   }
+
+  async findBestClients(start: Date, end: Date, limit: number) {
+    return Job.findAll({
+      attributes: [
+        "Contract.Client.id",
+        [sequelize.fn("sum", sequelize.col("price")), "paid"],
+        [
+          sequelize.literal(
+            "'Contract->Client'.firstName || ' ' || 'Contract->Client'.lastName"
+          ),
+          "fullName",
+        ],
+      ],
+      include: [
+        {
+          model: Contract,
+          required: true,
+          attributes: [],
+          include: [
+            {
+              model: Profile,
+              as: "Client",
+              attributes: [],
+              required: true,
+            },
+          ],
+        },
+      ],
+      where: {
+        paid: true,
+        paymentDate: {
+          [Op.between]: [start, end],
+        },
+      },
+      group: ["Contract.Client.id"],
+      order: [[sequelize.literal("paid"), "DESC"]],
+      limit: limit,
+      raw: true,
+    });
+  }
 }
