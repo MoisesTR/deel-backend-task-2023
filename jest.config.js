@@ -2,6 +2,7 @@ module.exports = {
   testTimeout: 15000,
   verbose: true,
   preset: "ts-jest",
+  setupFilesAfterEnv: ['./jest.setup.js'],
   testEnvironment: "node",
   moduleFileExtensions: ["js", "json", "ts"],
   roots: ["src", "tests"],
