@@ -29,11 +29,7 @@ export class AdminController implements interfaces.Controller {
     const { start, end } = req.query;
     const startDate = String(start);
     const endDate = String(end);
-    const validationResult = this.validateDates(startDate, endDate);
-
-    if (!validationResult.valid) {
-      return res.status(400).send(validationResult.message);
-    }
+    this.validateDates(startDate, endDate);
 
     const bestProfession = await this.adminService.findBestProfession(
       new Date(startDate),
@@ -56,14 +52,10 @@ export class AdminController implements interfaces.Controller {
     const { start, end, limit } = req.query;
     const startDate = String(start);
     const endDate = String(end);
-    const validationDateResult = this.validateDates(startDate, endDate);
-
-    if (!validationDateResult.valid) {
-      return res.status(400).send(validationDateResult.message);
-    }
+  
+    this.validateDates(startDate, endDate);
 
     const limitNumber = limit ? parseInt(String(limit)) : 2;
-
     if (isNaN(limitNumber) || limitNumber < 1) {
       throw new AppError("Limit must be a positive integer.", 400);
     }
@@ -79,21 +71,18 @@ export class AdminController implements interfaces.Controller {
 
   private validateDates(startDate: string, endDate: string) {
     if (!startDate || !endDate) {
-      return {
-        valid: false,
-        message: "Both start date and end date are required.",
-      };
+      throw new AppError("Both start date and end date are required.", 400)
     }
 
     const start = new Date(startDate);
     const end = new Date(endDate);
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return { valid: false, message: "Invalid date format." };
+      throw new AppError("Invalid date format", 400);
     }
 
     if (start > end) {
-      return { valid: false, message: "Start date must be before end date." };
+      throw new AppError("Start date must be before end date", 400);
     }
 
     return { valid: true };

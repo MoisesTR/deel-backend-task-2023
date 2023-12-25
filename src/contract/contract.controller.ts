@@ -30,8 +30,11 @@ export class ContractController implements interfaces.Controller {
     const { profile } = req;
 
     const contract = await this.contractService.find(id);
-    if (!contract) return res.status(404);
 
+    if (!contract) {
+      return res.status(404).end();
+    }
+    
     if (
       contract.ContractorId !== profile.id &&
       contract.ClientId !== profile.id

@@ -41,7 +41,7 @@ export class JobController implements interfaces.Controller {
   ) {
     const { job_id } = req.params;
 
-    await this.jobService.payJob(req.profile, Number(job_id));
+    await this.jobService.payJob(req.profile, parseInt(job_id));
     return res.status(200).end();
   }
 }

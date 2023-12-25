@@ -97,7 +97,7 @@ export class JobService {
     if (job.Contract.ClientId !== profile.id) {
       throw new AppError(
         "Action permitted only for jobs linked to your client account.",
-        400
+        409
       );
     }
 
@@ -108,7 +108,7 @@ export class JobService {
     if (profile.balance === undefined || profile.balance === null) {
       throw new AppError(
         "Client balance not set. Please ensure the client account has a defined balance.",
-        404
+        400
       );
     }
 
